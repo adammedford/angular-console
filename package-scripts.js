@@ -39,7 +39,7 @@ module.exports = {
       test: 'nx affected:test --base=master'
     },
     server: {
-      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only', withPlatform('move-graphql')),
+      compile: npsUtils.series.nps('server.gen-graphql-types', 'server.gen-apollo-angular', 'server.compile-only', 'server.move-graphql'),
       'compile-only': 'tsc -p server/tsconfig.json',
       format: {
         default: npsUtils.series.nps('server.format.write'),
@@ -47,6 +47,7 @@ module.exports = {
         check: 'prettier --list-different \"./server/**/*.ts\"'
       },
       test: 'node ./tools/scripts/test ./server/test',
+      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql',
       'gen-graphql-types': 'gql-gen --config codegen-server.yml',
       'gen-apollo-angular': 'gql-gen --config codegen-client.js'
     },
@@ -60,7 +61,6 @@ module.exports = {
       'start-server': 'electron dist/server --server --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/server',
       'builder-dist': 'electron-builder --mac -p never',
-      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql'
     },
     linux: {
       'clean': 'rm -rf dist',
@@ -71,8 +71,7 @@ module.exports = {
       'copy-to-osbuilds': 'cp -r dist/packages osbuilds/linux',
       'start-server': 'electron dist/server --server --inspect=9229',
       'start-electron': 'NODE_ENV=development electron dist/server',
-      'builder-dist': 'electron-builder --linux -p never',
-      'move-graphql': 'cp server/src/schema/schema.graphql dist/server/src/schema/schema.graphql'
+      'builder-dist': 'electron-builder --linux -p never'
     },
     win: {
       'clean': 'if exist dist rmdir dist /s /q',
@@ -83,8 +82,7 @@ module.exports = {
       'copy-to-osbuilds': 'robocopy dist\\packages osbuilds\\win /e || echo 0',
       'start-server': 'electron dist\\server --server --inspect=9229',
       'start-electron': 'electron dist\\server',
-      'builder-dist': 'electron-builder --win -p never',
-      'move-graphql': 'copy server\\src\\schema\\schema.graphql dist\\server\\src\\schema\\schema.graphql'
+      'builder-dist': 'electron-builder --win -p never'
     },
     dev: {
       'patch-cli': 'node ./tools/scripts/patch-cli.js',
